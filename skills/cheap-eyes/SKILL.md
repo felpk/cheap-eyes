@@ -9,9 +9,11 @@ Screenshots are the expensive way to look at a page. Each image costs about 1,00
 
 ## Rules
 
-1. **Measure first, look last.** Run the checker. Fix what it reports. Run it again.
+1. **Measure first, look last.** Run the checker. Fix what it reports. Run it again. This holds even when you wrote your own flow test: the flow test checks behavior, the checker checks what a user sees, and it is the cheapest of the three.
 2. **Never Read an image in the main session.** If something still needs eyes, hand it to the `cheap-eyes:visual-checker` subagent. It opens the crops, answers in text, and the images die with it.
-3. **Do not hide results.** Report what the checker found, including what you did not fix. A finding you think is wrong is reported as "disputed", with the reason, not dropped.
+3. **One subagent call per round.** Each call to the visual-checker has a fixed cost of roughly 15k to 20k tokens before it opens any image. Put every crop and question for this round in a single call. Never spawn one call per image or per width.
+4. **Crops, never long full pages.** A full-page shot of a long page gets shrunk before the model sees it (a 390px page 3,000px tall loses about 4x), so text can't be read and the call is wasted. Use `--shot` to crop the parts that changed; tall parts come out in slices.
+5. **Do not hide results.** Report what the checker found, including what you did not fix. A finding you think is wrong is reported as "disputed", with the reason, not dropped.
 
 ## Step 1: run the checker
 
@@ -30,13 +32,15 @@ What it does not catch: wrong numbers, wrong copy, broken flows (login, checkout
 
 ## Step 2: only if a human-eye question is left
 
-Use it for a new visual change (a new section, a new layout), or for a finding you cannot judge from text. Run the checker with crops, then spawn the subagent:
+Use it for a new visual change (a new section, a new layout), or for a finding you cannot judge from text. Run the checker with crops of the flagged elements and of the parts that changed:
 
 ```sh
-node ${CLAUDE_PLUGIN_ROOT}/skills/cheap-eyes/scripts/check.cjs <url> --crops /tmp/cheap-eyes-crops
+node ${CLAUDE_PLUGIN_ROOT}/skills/cheap-eyes/scripts/check.cjs <url> --crops /tmp/cheap-eyes-crops --shot "#pricing,footer"
 ```
 
-Spawn `cheap-eyes:visual-checker` with: the URL, what changed, the crop paths you care about, and the question ("is the new pricing card aligned with the others at 390px?"). It answers in at most 10 lines. Do not ask it to send images back.
+The end of the output lists every crop path by width. Then make **one** call to `cheap-eyes:visual-checker` with: the URL, what changed, all the crop paths, and the questions ("is the new pricing card aligned with the others at 390px?"). It answers in at most 10 lines. Do not ask it to send images back.
+
+States that only exist after a click (a modal, step 2 of a form, the page after payment) are not reachable by URL. Take those crops in your flow test with `locator.screenshot()` (slice anything taller than about 1,100px) and pass the paths the same way.
 
 ## Reporting
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // cheap-eyes: finds the bugs a user would hit in the first minute, and reports them as text.
-// Usage: node check.cjs <url> [more urls] [--widths 390,1280] [--crops <dir>] [--json] [--links 40]
+// Usage: node check.cjs <url> [more urls] [--widths 390,1280] [--crops <dir>] [--shot <css>[,<css>]] [--json] [--links 40]
+// --shot saves crops of the named elements (for a new visual change) even when nothing is wrong with them.
 // Exit code: 0 = nothing found, 1 = issues found, 2 = could not run.
 'use strict';
 
@@ -13,14 +14,17 @@ function loadPlaywright() {
 }
 
 const args = process.argv.slice(2);
-const opt = { widths: [390, 1280], crops: null, json: false, links: 40, urls: [] };
+const opt = { widths: [390, 1280], crops: null, shot: [], json: false, links: 40, urls: [] };
+// Taller than this, a crop is cut in slices: the model shrinks tall images until the text is unreadable.
+const SLICE = 1100;
 for (let i = 0; i < args.length; i++) {
   const a = args[i];
   if (a === '--widths') opt.widths = args[++i].split(',').map(Number);
   else if (a === '--crops') opt.crops = args[++i];
+  else if (a === '--shot') opt.shot.push(...args[++i].split(',').map((x) => x.trim()).filter(Boolean));
   else if (a === '--json') opt.json = true;
   else if (a === '--links') opt.links = Number(args[++i]);
-  else if (a === '-h' || a === '--help') { console.log('node check.cjs <url>... [--widths 390,1280] [--crops dir] [--json] [--links 40]'); process.exit(0); }
+  else if (a === '-h' || a === '--help') { console.log('node check.cjs <url>... [--widths 390,1280] [--crops dir] [--shot css,css] [--json] [--links 40]'); process.exit(0); }
   else opt.urls.push(a);
 }
 if (!opt.urls.length) { console.error('cheap-eyes: pass at least one URL'); process.exit(2); }
@@ -131,7 +135,24 @@ function inspectDom(width) {
   const { chromium } = loadPlaywright();
   const fs = require('node:fs'), path = require('node:path');
   const browser = await chromium.launch();
-  const report = [];
+  const report = [], shots = [];
+  // One element -> one png, or several slices when it is taller than SLICE px.
+  async function crop(page, loc, base) {
+    try {
+      await loc.scrollIntoViewIfNeeded({ timeout: 3000 });
+      const box = await loc.boundingBox();
+      if (!box || box.width < 1 || box.height < 1) return [];
+      if (box.height <= SLICE) { await loc.screenshot({ path: base + '.png', timeout: 3000 }); return [base + '.png']; }
+      const sy = await page.evaluate(() => window.scrollY), out = [];
+      for (let y = 0, n = 1; y < box.height; y += SLICE, n++) {
+        const file = `${base}-${n}.png`;
+        await page.screenshot({ path: file, fullPage: true, timeout: 5000,
+          clip: { x: box.x, y: box.y + sy + y, width: box.width, height: Math.min(SLICE, box.height - y) } });
+        out.push(file);
+      }
+      return out;
+    } catch { return []; }
+  }
   for (const [ui, url] of opt.urls.entries()) {
     const checkedLinks = new Set();
     for (const width of opt.widths) {
@@ -170,12 +191,18 @@ function inspectDom(width) {
         try { const r = await ctx.request.get(href, { timeout: 10000, maxRedirects: 5 }); if (r.status() >= 400) issues.push({ kind: 'dead-link', msg: `link ${href} -> ${r.status()}` }); }
         catch (e) { issues.push({ kind: 'dead-link', msg: `link ${href} -> ${String(e.message).split('\n')[0]}` }); }
       }
+      if (opt.shot.length && !opt.crops) opt.crops = path.join(require('node:os').tmpdir(), 'cheap-eyes-crops');
       if (opt.crops) {
         fs.mkdirSync(opt.crops, { recursive: true });
         for (const is of issues) for (const it of is.items || []) {
           if (!it.crop) continue;
-          const file = path.join(opt.crops, `p${ui + 1}-${width}-${it.crop}.png`);
-          try { await page.locator(`[data-cheap-eyes="${it.crop}"]`).first().screenshot({ path: file, timeout: 3000 }); it.crop = file; } catch { delete it.crop; }
+          const files = await crop(page, page.locator(`[data-cheap-eyes="${it.crop}"]`).first(), path.join(opt.crops, `p${ui + 1}-${width}-${it.crop}`));
+          if (files.length) it.crop = files.join(' '); else delete it.crop;
+        }
+        for (const [si, css] of opt.shot.entries()) {
+          const loc = page.locator(css).first();
+          const files = (await loc.count().catch(() => 0)) ? await crop(page, loc, path.join(opt.crops, `p${ui + 1}-${width}-shot${si + 1}`)) : [];
+          shots.push({ url, width, sel: css, files });
         }
       }
       for (const is of issues) for (const it of is.items || []) if (!opt.crops) delete it.crop;
@@ -192,7 +219,7 @@ function inspectDom(width) {
   await browser.close();
 
   const total = report.reduce((s, r) => s + r.issues.length, 0);
-  if (opt.json) console.log(JSON.stringify({ total, report }, null, 1));
+  if (opt.json) console.log(JSON.stringify({ total, report, shots }, null, 1));
   else {
     for (const r of report) {
       console.log(`${r.url} @ ${r.width}px: ${r.issues.length ? r.issues.length + ' issue(s)' : 'ok'}`);
@@ -206,6 +233,10 @@ function inspectDom(width) {
         }
         if (list.length > 3) console.log(`  [${kind}] ...and ${list.length - 3} more like these (--json lists all)`);
       }
+    }
+    if (shots.length) {
+      console.log('\nCrops for the visual-checker (send them all in one call):');
+      for (const s of shots) console.log(`  ${s.width}px ${s.sel}: ${s.files.length ? s.files.join(' ') : 'not on the page or hidden at this width'}`);
     }
     console.log(total ? `\n${total} issue(s).` : '\nNo issues found.');
   }

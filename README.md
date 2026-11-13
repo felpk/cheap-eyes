@@ -34,4 +34,10 @@ Then ask Claude to check a page, or run it yourself:
 node skills/cheap-eyes/scripts/check.cjs http://localhost:3000/
 ```
 
+To look at a part you changed, crop it (tall parts come out in slices, so the text stays readable) and hand all the crops to the subagent in one call:
+
+```sh
+node skills/cheap-eyes/scripts/check.cjs http://localhost:3000/ --shot "#pricing,footer"
+```
+
 MIT

@@ -1,6 +1,6 @@
 {
   "name": "cheap-eyes",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Catch the bugs a user hits in the first minute, as text, without burning context on screenshots.",
   "author": { "name": "felpk", "url": "https://github.com/felpk" },
   "repository": "https://github.com/felpk/cheap-eyes",

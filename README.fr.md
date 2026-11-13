@@ -34,4 +34,10 @@ Ensuite, demandez à Claude de vérifier une page, ou lancez-le vous-même :
 node skills/cheap-eyes/scripts/check.cjs http://localhost:3000/
 ```
 
+Pour regarder une partie modifiée, recadrez-la et passez tous les recadrages au sous-agent en un seul appel. Les parties hautes sortent en tranches, pour que le texte reste lisible :
+
+```sh
+node skills/cheap-eyes/scripts/check.cjs http://localhost:3000/ --shot "#pricing,footer"
+```
+
 MIT
