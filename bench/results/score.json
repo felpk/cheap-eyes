@@ -1,0 +1,110 @@
+{
+ "caught": 11,
+ "total": 12,
+ "rows": [
+  {
+   "id": "bug-overflow",
+   "what": "box 620px wide on a 390px phone",
+   "caught": true,
+   "widths": [
+    390
+   ]
+  },
+  {
+   "id": "bug-clipped",
+   "what": "button label cut off",
+   "caught": true,
+   "widths": [
+    390,
+    1280
+   ]
+  },
+  {
+   "id": "bug-covered",
+   "what": "cookie bar covers the checkout button",
+   "caught": true,
+   "widths": [
+    390,
+    1280
+   ]
+  },
+  {
+   "id": "bug-img",
+   "what": "product image 404",
+   "caught": true,
+   "widths": [
+    390,
+    1280
+   ]
+  },
+  {
+   "id": "bug-js",
+   "what": "JS crash on load",
+   "caught": true,
+   "widths": [
+    390,
+    1280
+   ]
+  },
+  {
+   "id": "bug-link",
+   "what": "dead link in the menu",
+   "caught": true,
+   "widths": [
+    390
+   ]
+  },
+  {
+   "id": "bug-noname",
+   "what": "icon button with no label",
+   "caught": true,
+   "widths": [
+    390,
+    1280
+   ]
+  },
+  {
+   "id": "bug-tiny",
+   "what": "close button 14x14px",
+   "caught": true,
+   "widths": [
+    390
+   ]
+  },
+  {
+   "id": "bug-fetch",
+   "what": "API call answers 500",
+   "caught": true,
+   "widths": [
+    390,
+    1280
+   ]
+  },
+  {
+   "id": "bug-contrast",
+   "what": "light grey text on white",
+   "caught": true,
+   "widths": [
+    390,
+    1280
+   ]
+  },
+  {
+   "id": "bug-logic",
+   "what": "cart total is wrong (10 + 5 = 20)",
+   "caught": false,
+   "widths": []
+  },
+  {
+   "id": "bug-orphan",
+   "what": "heading ends with one word alone",
+   "caught": true,
+   "widths": [
+    390,
+    1280
+   ]
+  }
+ ],
+ "unexplained": [],
+ "falseAlarms": []
+}

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loja Jabuticaba</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <img src="logo.svg" alt="Loja Jabuticaba" width="32" height="32">
+  <nav><a href="/clean.html">Início</a> <a href="/bugs.html">Promoções</a></nav>
+  <button class="icon" aria-label="Abrir menu"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor"/></svg></button>
+</header>
+<main>
+  <h1>Canecas esmaltadas<br>feitas à mão em BH</h1>
+  <p>Frete grátis acima de R$ 150.<br>Entrega em todo o Brasil.</p>
+  <article class="card">
+    <img src="logo.svg" alt="Caneca azul" width="160" height="120">
+    <h2>Caneca azul</h2>
+    <p>R$ 10,00</p>
+    <button class="btn">Adicionar ao carrinho</button>
+  </article>
+  <form class="card" onsubmit="return false">
+    <label for="email">Seu e-mail</label>
+    <input id="email" type="email" placeholder="voce@exemplo.com">
+    <label><input type="checkbox"> Quero receber novidades</label>
+    <button class="btn" type="submit">Cadastrar</button>
+  </form>
+  <div class="scroller"><table><tr><td>Tamanho P</td><td>Tamanho M</td><td>Tamanho G</td><td>Tamanho GG</td><td>Tamanho XG</td><td>Tamanho XXG</td></tr></table></div>
+</main>
+<script>fetch('/api/ok').then((r) => r.json());</script>
+</body>
+</html>
