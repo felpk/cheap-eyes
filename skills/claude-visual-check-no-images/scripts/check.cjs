@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// cheap-eyes: finds the bugs a user would hit in the first minute, and reports them as text.
+// claude-visual-check-no-images: finds the bugs a user would hit in the first minute, and reports them as text.
 // Usage: node check.cjs <url> [more urls] [--widths 390,1280] [--crops <dir>] [--shot <css>[,<css>]] [--json] [--links 40]
 // --shot saves crops of the named elements (for a new visual change) even when nothing is wrong with them.
 // Exit code: 0 = nothing found, 1 = issues found, 2 = could not run.
@@ -8,7 +8,7 @@
 function loadPlaywright() {
   const tries = [process.env.PLAYWRIGHT, 'playwright', 'playwright-core', '@playwright/test'].filter(Boolean);
   for (const t of tries) { try { return require(t); } catch {} }
-  console.error('cheap-eyes: Playwright not found. Run `npm i -D playwright && npx playwright install chromium`,\n' +
+  console.error('claude-visual-check-no-images: Playwright not found. Run `npm i -D playwright && npx playwright install chromium`,\n' +
     'or point PLAYWRIGHT=/path/to/node_modules/playwright.');
   process.exit(2);
 }
@@ -27,7 +27,7 @@ for (let i = 0; i < args.length; i++) {
   else if (a === '-h' || a === '--help') { console.log('node check.cjs <url>... [--widths 390,1280] [--crops dir] [--shot css,css] [--json] [--links 40]'); process.exit(0); }
   else opt.urls.push(a);
 }
-if (!opt.urls.length) { console.error('cheap-eyes: pass at least one URL'); process.exit(2); }
+if (!opt.urls.length) { console.error('claude-visual-check-no-images: pass at least one URL'); process.exit(2); }
 
 // Runs inside the page. Returns layout/usability problems found in the DOM.
 function inspectDom(width) {
@@ -49,7 +49,7 @@ function inspectDom(width) {
     const r = el.getBoundingClientRect(); const cs = getComputedStyle(el);
     return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none' && Number(cs.opacity) > 0;
   };
-  const mark = (el) => { const id = 'ce' + (n++); el.setAttribute('data-cheap-eyes', id); return id; };
+  const mark = (el) => { const id = 'ce' + (n++); el.setAttribute('data-cve', id); return id; };
   const scrollsX = (el) => { for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) { const o = getComputedStyle(p).overflowX; if (o === 'auto' || o === 'scroll' || o === 'hidden' || o === 'clip') return true; } return false; };
   const all = [...document.body.querySelectorAll('*')].filter((el) => !['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE'].includes(el.tagName));
 
@@ -191,12 +191,12 @@ function inspectDom(width) {
         try { const r = await ctx.request.get(href, { timeout: 10000, maxRedirects: 5 }); if (r.status() >= 400) issues.push({ kind: 'dead-link', msg: `link ${href} -> ${r.status()}` }); }
         catch (e) { issues.push({ kind: 'dead-link', msg: `link ${href} -> ${String(e.message).split('\n')[0]}` }); }
       }
-      if (opt.shot.length && !opt.crops) opt.crops = path.join(require('node:os').tmpdir(), 'cheap-eyes-crops');
+      if (opt.shot.length && !opt.crops) opt.crops = path.join(require('node:os').tmpdir(), 'claude-visual-check-no-images-crops');
       if (opt.crops) {
         fs.mkdirSync(opt.crops, { recursive: true });
         for (const is of issues) for (const it of is.items || []) {
           if (!it.crop) continue;
-          const files = await crop(page, page.locator(`[data-cheap-eyes="${it.crop}"]`).first(), path.join(opt.crops, `p${ui + 1}-${width}-${it.crop}`));
+          const files = await crop(page, page.locator(`[data-cve="${it.crop}"]`).first(), path.join(opt.crops, `p${ui + 1}-${width}-${it.crop}`));
           if (files.length) it.crop = files.join(' '); else delete it.crop;
         }
         for (const [si, css] of opt.shot.entries()) {
@@ -241,4 +241,4 @@ function inspectDom(width) {
     console.log(total ? `\n${total} issue(s).` : '\nNo issues found.');
   }
   process.exit(total ? 1 : 0);
-})().catch((e) => { console.error('cheap-eyes:', e.message); process.exit(2); });
+})().catch((e) => { console.error('claude-visual-check-no-images:', e.message); process.exit(2); });

@@ -1,4 +1,4 @@
-# cheap-eyes
+# claude-visual-check-no-images
 
 [English](README.md) · [Português](README.pt-BR.md)
 
@@ -11,7 +11,7 @@
 
 ## Résultats
 
-| | cheap-eyes | Captures dans la conversation principale |
+| | claude-visual-check-no-images | Captures dans la conversation principale |
 |---|---|---|
 | Bugs trouvés sur 12 plantés | **11** | 7 |
 | Tokens en entrée, 1re tâche | **53,7 k** | 82,8 k |
@@ -23,21 +23,21 @@ Il rate ce que seul le sens révèle, comme un total faux. Pour ça, il faut un 
 ## Installer
 
 ```
-/plugin marketplace add felpk/cheap-eyes
-/plugin install cheap-eyes@cheap-eyes
+/plugin marketplace add felpk/claude-visual-check-no-images
+/plugin install claude-visual-check-no-images@claude-visual-check-no-images
 npm i -D playwright && npx playwright install chromium
 ```
 
 Ensuite, demandez à Claude de vérifier une page, ou lancez-le vous-même :
 
 ```sh
-node skills/cheap-eyes/scripts/check.cjs http://localhost:3000/
+node skills/claude-visual-check-no-images/scripts/check.cjs http://localhost:3000/
 ```
 
 Pour regarder une partie modifiée, recadrez-la et passez tous les recadrages au sous-agent en un seul appel. Les parties hautes sortent en tranches, pour que le texte reste lisible :
 
 ```sh
-node skills/cheap-eyes/scripts/check.cjs http://localhost:3000/ --shot "#pricing,footer"
+node skills/claude-visual-check-no-images/scripts/check.cjs http://localhost:3000/ --shot "#pricing,footer"
 ```
 
 MIT

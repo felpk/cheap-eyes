@@ -1,4 +1,4 @@
-# cheap-eyes
+# claude-visual-check-no-images
 
 [English](README.md) · [Français](README.fr.md)
 
@@ -11,7 +11,7 @@
 
 ## Resultados
 
-| | cheap-eyes | Print na conversa principal |
+| | claude-visual-check-no-images | Print na conversa principal |
 |---|---|---|
 | 12 bugs plantados encontrados | **11** | 7 |
 | Tokens de entrada, 1ª tarefa | **53,7 mil** | 82,8 mil |
@@ -23,21 +23,21 @@ Não pega o que só o significado mostra, como um total errado. Isso pede teste 
 ## Instalar
 
 ```
-/plugin marketplace add felpk/cheap-eyes
-/plugin install cheap-eyes@cheap-eyes
+/plugin marketplace add felpk/claude-visual-check-no-images
+/plugin install claude-visual-check-no-images@claude-visual-check-no-images
 npm i -D playwright && npx playwright install chromium
 ```
 
 Depois é só pedir para o Claude checar a página, ou rodar você mesmo:
 
 ```sh
-node skills/cheap-eyes/scripts/check.cjs http://localhost:3000/
+node skills/claude-visual-check-no-images/scripts/check.cjs http://localhost:3000/
 ```
 
 Para olhar uma parte que mudou, recorte essa parte e passe todos os recortes ao subagente numa chamada só. Partes altas saem em fatias, para o texto continuar legível:
 
 ```sh
-node skills/cheap-eyes/scripts/check.cjs http://localhost:3000/ --shot "#pricing,footer"
+node skills/claude-visual-check-no-images/scripts/check.cjs http://localhost:3000/ --shot "#pricing,footer"
 ```
 
 MIT

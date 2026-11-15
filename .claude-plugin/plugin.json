@@ -1,9 +1,9 @@
 {
-  "name": "cheap-eyes",
-  "version": "0.2.0",
+  "name": "claude-visual-check-no-images",
+  "version": "0.3.0",
   "description": "Catch the bugs a user hits in the first minute, as text, without burning context on screenshots.",
   "author": { "name": "felpk", "url": "https://github.com/felpk" },
-  "repository": "https://github.com/felpk/cheap-eyes",
+  "repository": "https://github.com/felpk/claude-visual-check-no-images",
   "license": "MIT",
-  "keywords": ["playwright", "qa", "screenshots", "tokens", "context"]
+  "keywords": ["claude-code", "playwright", "screenshots", "tokens", "context-window", "qa"]
 }

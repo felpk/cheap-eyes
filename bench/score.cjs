@@ -5,7 +5,7 @@
 const { execFile } = require('node:child_process');
 const path = require('node:path'), fs = require('node:fs');
 const { start } = require('./serve.cjs');
-const CHECK = path.join(__dirname, '..', 'skills', 'cheap-eyes', 'scripts', 'check.cjs');
+const CHECK = path.join(__dirname, '..', 'skills', 'claude-visual-check-no-images', 'scripts', 'check.cjs');
 
 const has = (i, s) => JSON.stringify(i).includes(s);
 // Each planted bug in fixtures/bugs.html, and how to recognise it in the report.

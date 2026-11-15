@@ -1,9 +1,9 @@
 {
   "$schema": "https://www.schemastore.org/claude-code-marketplace.json",
-  "name": "cheap-eyes",
+  "name": "claude-visual-check-no-images",
   "description": "Catch visible web bugs as text instead of screenshots.",
   "owner": { "name": "felpk" },
   "plugins": [
-    { "name": "cheap-eyes", "description": "Page checker + a subagent that looks at screenshots so your main session does not.", "source": "./", "category": "development" }
+    { "name": "claude-visual-check-no-images", "description": "Page checker + a subagent that looks at screenshots so your main session does not.", "source": "./", "category": "development" }
   ]
 }

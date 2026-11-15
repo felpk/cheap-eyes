@@ -1,6 +1,6 @@
 ---
 name: visual-checker
-description: Looks at page screenshots so the main session does not have to. Give it a URL, what changed, crop paths from cheap-eyes, and a question. It answers in text, at most 10 lines; the images never reach the caller.
+description: Looks at page screenshots so the main session does not have to. Give it a URL, what changed, crop paths from claude-visual-check-no-images, and a question. It answers in text, at most 10 lines; the images never reach the caller.
 tools: Read, Bash, Glob
 ---
 
